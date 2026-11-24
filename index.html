@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер трекера: Универсальная оценка стартапа</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --bg: #f4f7f6;
+            --card: #ffffff;
+            --text: #333;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            background-color: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 15px;
+        }
+
+        .input-group {
+            margin-bottom: 30px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Блоки оценки */
+        .section-title {
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .q-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            background: #fafafa;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .q-item:last-child { border-bottom: none; }
+
+        .q-text { flex: 1; padding-right: 20px; font-size: 15px; line-height: 1.4; }
+
+        .toggle-btn {
+            display: flex;
+            gap: 5px;
+        }
+
+        .toggle-btn button {
+            padding: 8px 16px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .toggle-btn button:hover { background: #f0f0f0; }
+        .toggle-btn button.yes.active { background: var(--success); color: white; border-color: var(--success); }
+        .toggle-btn button.no.active { background: var(--danger); color: white; border-color: var(--danger); }
+
+        /* Кнопка результата */
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: background 0.2s;
+        }
+
+        .submit-btn:hover { background-color: #357abd; }
+
+        /* Результат */
+        #result-block {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 20px;
+            background: #fdfdfd;
+            border: 3px dashed #ccc;
+        }
+
+        .score { font-size: 42px; font-weight: bold; margin: 10px 0; }
+        .verdict { font-size: 22px; font-weight: bold; margin-bottom: 15px; }
+        .recommendation { font-size: 16px; color: #444; line-height: 1.6; text-align: left;}
+        
+        .restart-btn {
+            background-color: #95a5a6 !important;
+            margin-top: 25px !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📋 Тренажер трекера: Оценка стартапа</h1>
+    <div class="subtitle">Универсальный чек-лист готовности проекта ко второй стадии (акселератору)</div>
+
+    <div class="input-group">
+        <label for="projectName">Название проекта / Имя основателя:</label>
+        <input type="text" id="projectName" placeholder="Например: Приложение «Умный дом» (Иванов И.И.)">
+    </div>
+
+    <form id="evaluationForm">
+        <!-- Блок 1 -->
+        <div class="section-title">Блок 1. Мотивация и команда</div>
+        <div id="block-1"></div>
+
+        <!-- Блок 2 -->
+        <div class="section-title">Блок 2. Проблема и рынок</div>
+        <div id="block-2"></div>
+
+        <!-- Блок 3 -->
+        <div class="section-title">Блок 3. Продукт и юридическая гигиена</div>
+        <div id="block-3"></div>
+    </form>
+
+    <button class="submit-btn" onclick="calculateResult()">Сформировать итоговое решение</button>
+
+    <!-- Результат -->
+    <div id="result-block">
+        <div class="verdict" id="verdict-text"></div>
+        <div class="score" id="score-text"></div>
+        <div class="recommendation" id="rec-text"></div>
+        <button class="submit-btn restart-btn" onclick="location.reload()">Оценить другой проект</button>
+    </div>
+</div>
+
+<script>
+    // Данные вопросов, разбитые по блокам
+    const questionsData = [
+        // Блок 1
+        { id: "b1_1", block: 1, text: "Может ли основатель четко объяснить, почему он хочет решить именно эту проблему?", weight: 1 },
+        { id: "b1_2", block: 1, text: "Готов ли основатель работать вне учебного расписания (вечера, выходные)?", weight: 1 },
+        { id: "b1_3", block: 1, text: "Как основатель реагирует на критику? Готов ли он отказаться от идеи, если рынок скажет «нет»?", weight: 1 },
+        { id: "b1_4", block: 1, text: "Есть ли в команде (или плане на ближайшее время) люди, закрывающие 3 роли: технарь, коммерсант, дизайнер?", weight: 1 },
+        { id: "b1_5", block: 1, text: "Обсуждали ли основатели, как будут делиться доли в будущем (чтобы избежать конфликтов)?", weight: 1 },
+
+        // Блок 2
+        { id: "b2_1", block: 2, text: "Провел ли основатель минимум 10 глубинных интервью (CustDev) с потенциальными клиентами?", weight: 1 },
+        { id: "b2_2", block: 2, text: "Может ли основатель описать проблему в одном предложении без сложных терминов?", weight: 1 },
+        { id: "b2_3", block: 2, text: "Определен ли конкретный человек (покупатель), который готов расстаться с деньгами ради решения проблемы?", weight: 1 },
+        { id: "b2_4", block: 2, text: "Изучил ли основатель конкурентов и есть ли ответ на вопрос: «Почему клиенты купят у нас, а не у них?»", weight: 1 },
+
+        // Блок 3
+        { id: "b3_1", block: 3, text: "Есть ли идея, как протестировать решение минимальными силами (лендинг, ручной сервис, прототип)?", weight: 1 },
+        { id: "b3_2", block: 3, text: "Понимает ли основатель, из чего будет складываться цена продукта и его себестоимость?", weight: 1 },
+        { id: "b3_3", block: 3, text: "Не является ли проект разработкой, выполненной «в рабочее время» на текущем месте работы основателя?", weight: 1 },
+        { id: "b3_4", block: 3, text: "Есть ли план по защите ключевых элементов интеллектуальной собственности (товарный знак, код)?", weight: 1 }
+    ];
+
+    // Хранилище ответов (0 - нет, 1 - да)
+    const answers = {};
+
+    // Рендер вопросов по блокам
+    function renderQuestions() {
+        const b1 = document.getElementById('block-1');
+        const b2 = document.getElementById('block-2');
+        const b3 = document.getElementById('block-3');
+
+        questionsData.forEach(q => {
+            const div = document.createElement('div');
+            div.className = 'q-item';
+            
+            const text = document.createElement('div');
+            text.className = 'q-text';
+            text.innerText = q.text;
+            
+            const btnGroup = document.createElement('div');
+            btnGroup.className = 'toggle-btn';
+            
+            const btnYes = document.createElement('button');
+            btnYes.type = 'button';
+            btnYes.innerText = 'Да';
+            btnYes.id = `yes_${q.id}`;
+            btnYes.onclick = () => setAnswer(q.id, 1);
+            
+            const btnNo = document.createElement('button');
+            btnNo.type = 'button';
+            btnNo.innerText = 'Нет';
+            btnNo.id = `no_${q.id}`;
+            btnNo.onclick = () => setAnswer(q.id, 0);
+            
+            btnGroup.appendChild(btnYes);
+            btnGroup.appendChild(btnNo);
+            
+            div.appendChild(text);
+            div.appendChild(btnGroup);
+
+            if (q.block === 1) b1.appendChild(div);
+            if (q.block === 2) b2.appendChild(div);
+            if (q.block === 3) b3.appendChild(div);
+        });
+    }
+
+    function setAnswer(qId, value) {
+        answers[qId] = value;
+        
+        const btnYes = document.getElementById(`yes_${qId}`);
+        const btnNo = document.getElementById(`no_${qId}`);
+        
+        if (value === 1) {
+            btnYes.classList.add('active');
+            btnNo.classList.remove('active');
+        } else {
+            btnNo.classList.add('active');
+            btnYes.classList.remove('active');
+        }
+    }
+
+    function calculateResult() {
+        const projectName = document.getElementById('projectName').value.trim();
+        
+        // Проверка, что на все вопросы даны ответы
+        if (Object.keys(answers).length !== questionsData.length) {
+            alert("Пожалуйста, ответьте на все вопросы перед формированием решения!");
+            return;
+        }
+
+        let totalScore = 0;
+        questionsData.forEach(q => {
+            totalScore += answers[q.id] * q.weight;
+        });
+
+        // Скрываем форму, показываем результат
+        document.getElementById('evaluationForm').style.display = 'none';
+        document.querySelector('.input-group').style.display = 'none';
+        document.querySelector('.submit-btn').style.display = 'none';
+        
+        const resBlock = document.getElementById('result-block');
+        resBlock.style.display = 'block';
+
+        const scoreText = document.getElementById('score-text');
+        const verdictText = document.getElementById('verdict-text');
+        const recText = document.getElementById('rec-text');
+
+        const nameText = projectName ? `«${projectName}»` : "Проект";
+
+        scoreText.innerText = `${totalScore} из ${questionsData.length} баллов`;
+
+        // Логика вердикта (13 вопросов всего)
+        if (totalScore >= 10) {
+            resBlock.style.borderColor = 'var(--success)';
+            verdictText.innerText = `✅ ${nameText} готов к акселератору!`;
+            verdictText.style.color = 'var(--success)';
+            recText.innerHTML = `<b>Решение трекера:</b> Рекомендовать к участию во второй стадии.<br><br>
+                                 <b>Обоснование:</b> Проект демонстрирует сильную команду, проверенную проблему и понимание рынка. Юридические риски минимальны.<br><br>
+                                 <b>Дальнейшие шаги:</b> Помочь с подготовкой питч-дека и оформлением прав на интеллектуальную собственность.`;
+        } else if (totalScore >= 6) {
+            resBlock.style.borderColor = 'var(--warning)';
+            verdictText.innerText = `⚠️ ${nameText} требует доработки`;
+            verdictText.style.color = 'var(--warning)';
+            recText.innerHTML = `<b>Решение трекера:</b> Отправить на повторное интервью / доработку гипотезы.<br><br>
+                                 <b>Обоснование:</b> У проекта есть потенциал, но есть «слепые зоны». Обычно это связано с недостатком интервью или не до конца сформированной командой.<br><br>
+                                 <b>Дальнейшие шаги:</b> Дать задание провести еще 10 CustDev-интервью и помочь с поиском недостающих компетенций в команду.`;
+        } else {
+            resBlock.style.borderColor = 'var(--danger)';
+            verdictText.innerText = `❌ ${nameText} не готов`;
+            verdictText.style.color = 'var(--danger)';
+            recText.innerHTML = `<b>Решение трекера:</b> Отказать в участии на текущем этапе.<br><br>
+                                 <b>Обоснование:</b> Идея сырая. Основатель не проверил проблему, нет команды или плана MVP. Высокие юридические риски.<br><br>
+                                 <b>Дальнейшие шаги:</b> Вежливо отказать и предложить вернуться через семестр после проведения интервью с реальными клиентами.`;
+        }
+    }
+
+    // Инициализация
+    renderQuestions();
+</script>
+
+</body>
+</html>
